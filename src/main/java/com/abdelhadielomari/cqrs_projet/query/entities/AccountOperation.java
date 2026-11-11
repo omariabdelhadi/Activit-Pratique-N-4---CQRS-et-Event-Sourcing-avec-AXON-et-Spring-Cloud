@@ -1,0 +1,26 @@
+package com.abdelhadielomari.cqrs_projet.query.entities;
+
+import com.abdelhadielomari.cqrs_projet.enums.OperationType;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Date;
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Builder
+public class AccountOperation {
+    @Id @GeneratedValue
+    private Long id;
+    private Date date;
+    private double amount;
+    @Enumerated(EnumType.STRING)
+    private OperationType type;
+    private String currency;
+    @ManyToOne
+    private Account account;
+}

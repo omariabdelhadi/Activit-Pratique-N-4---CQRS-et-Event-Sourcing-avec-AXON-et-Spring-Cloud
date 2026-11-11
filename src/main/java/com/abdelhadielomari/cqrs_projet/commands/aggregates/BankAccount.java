@@ -2,10 +2,12 @@ package com.abdelhadielomari.cqrs_projet.commands.aggregates;
 
 import com.abdelhadielomari.cqrs_projet.commands.commands.AddAccountCommand;
 import com.abdelhadielomari.cqrs_projet.commands.commands.DebitAccountCommand;
+import com.abdelhadielomari.cqrs_projet.commands.commands.UpdateAccountStatuCommand;
 import com.abdelhadielomari.cqrs_projet.enums.AccountStatus;
 import com.abdelhadielomari.cqrs_projet.events.AccountActivatedEvent;
 import com.abdelhadielomari.cqrs_projet.events.AccountCreatedEvent;
 import com.abdelhadielomari.cqrs_projet.events.AccountDebitEvent;
+import com.abdelhadielomari.cqrs_projet.events.AccountUpdatStatueEvent;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.axonframework.commandhandling.CommandHandler;
@@ -43,6 +45,16 @@ public class BankAccount {
         }
         if (this.balance<command.getAmount()) throw new IllegalStateException("Fonds insuffisants !");
         AggregateLifecycle.apply(new AccountDebitEvent(command.getAccountId(),command.getAmount()));
+    }
+
+    @CommandHandler
+    public void UpdateStatu(UpdateAccountStatuCommand updateAccountStatuCommand){
+        AggregateLifecycle.apply(new AccountUpdatStatueEvent(updateAccountStatuCommand.getAccountId(),updateAccountStatuCommand.getAccountStatus()));
+    }
+
+    @EventSourcingHandler
+    public void on(AccountUpdatStatueEvent event){
+        this.status=event.getAccountStatus();
     }
 
     @EventSourcingHandler
