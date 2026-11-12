@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.util.Date;
 @Entity
 @AllArgsConstructor
@@ -16,11 +17,10 @@ import java.util.Date;
 public class AccountOperation {
     @Id @GeneratedValue
     private Long id;
-    private Date date;
+    private Instant date;
     private double amount;
     @Enumerated(EnumType.STRING)
     private OperationType type;
-    private String currency;
     @ManyToOne
     private Account account;
 }

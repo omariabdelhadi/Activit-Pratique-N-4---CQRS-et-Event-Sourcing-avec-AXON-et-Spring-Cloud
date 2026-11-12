@@ -1,13 +1,11 @@
 package com.abdelhadielomari.cqrs_projet.commands.aggregates;
 
 import com.abdelhadielomari.cqrs_projet.commands.commands.AddAccountCommand;
+import com.abdelhadielomari.cqrs_projet.commands.commands.CreditAccountCommand;
 import com.abdelhadielomari.cqrs_projet.commands.commands.DebitAccountCommand;
 import com.abdelhadielomari.cqrs_projet.commands.commands.UpdateAccountStatuCommand;
 import com.abdelhadielomari.cqrs_projet.enums.AccountStatus;
-import com.abdelhadielomari.cqrs_projet.events.AccountActivatedEvent;
-import com.abdelhadielomari.cqrs_projet.events.AccountCreatedEvent;
-import com.abdelhadielomari.cqrs_projet.events.AccountDebitEvent;
-import com.abdelhadielomari.cqrs_projet.events.AccountUpdatStatueEvent;
+import com.abdelhadielomari.cqrs_projet.events.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.axonframework.commandhandling.CommandHandler;
@@ -36,6 +34,14 @@ public class BankAccount {
                 AccountStatus.CREATED
         ));
         AggregateLifecycle.apply(new AccountActivatedEvent(command.getAccountId(),AccountStatus.ACTIVATED));
+    }
+
+    @CommandHandler
+    public void credit(CreditAccountCommand command){
+        if (this.status != AccountStatus.ACTIVATED){
+            throw new IllegalStateException("Le compte n'est pas actif.");
+        }
+        AggregateLifecycle.apply(new AccountCreditEvent(command.getAccountId(),command.getAmount()));
     }
 
     @CommandHandler
@@ -74,6 +80,9 @@ public class BankAccount {
         this.status=event.getStatus();
     }
 
-
+    @EventSourcingHandler
+    public void on(AccountCreditEvent event){
+        this.balance+=event.getAmount();
+    }
 
 }
