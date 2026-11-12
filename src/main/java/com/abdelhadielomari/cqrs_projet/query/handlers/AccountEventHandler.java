@@ -4,10 +4,12 @@ import com.abdelhadielomari.cqrs_projet.enums.OperationType;
 import com.abdelhadielomari.cqrs_projet.events.*;
 import com.abdelhadielomari.cqrs_projet.query.entities.Account;
 import com.abdelhadielomari.cqrs_projet.query.entities.AccountOperation;
+import com.abdelhadielomari.cqrs_projet.query.queries.WatchEventQuery;
 import com.abdelhadielomari.cqrs_projet.query.repository.AccountRepository;
 import com.abdelhadielomari.cqrs_projet.query.repository.OperationRepository;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.eventhandling.EventMessage;
+import org.axonframework.queryhandling.QueryUpdateEmitter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +19,8 @@ public class AccountEventHandler {
     private AccountRepository accountRepository;
     @Autowired
     private OperationRepository operationRepository;
+    @Autowired
+    private QueryUpdateEmitter queryUpdateEmitter;
 
     @EventHandler
     public void on(AccountCreatedEvent accountCreatedEvent, EventMessage eventMessage){
@@ -57,7 +61,9 @@ public class AccountEventHandler {
         operationRepository.save(accountOperation);
         account.setBalance(account.getBalance()-accountDebitEvent.getAmount());
         accountRepository.save(account);
+        queryUpdateEmitter.emit(e->true,accountOperation);
     }
+
     @EventHandler
     public void on(AccountCreditEvent accountCreditEvent, EventMessage eventMessage){
         Account account=accountRepository.findById(accountCreditEvent.getAccountId()).orElse(null);
@@ -70,5 +76,9 @@ public class AccountEventHandler {
         operationRepository.save(accountOperation);
         account.setBalance(account.getBalance()+accountCreditEvent.getAmount());
         accountRepository.save(account);
+        queryUpdateEmitter.emit(
+                WatchEventQuery.class,
+                query -> query.getAccountId().equals(account.getId()),accountOperation
+        );
     }
 }

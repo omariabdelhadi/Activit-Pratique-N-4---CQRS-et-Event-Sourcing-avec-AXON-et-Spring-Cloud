@@ -1,9 +1,12 @@
 package com.abdelhadielomari.cqrs_projet.query.handlers;
 
+import com.abdelhadielomari.cqrs_projet.query.dtos.AccountStatementDTO;
 import com.abdelhadielomari.cqrs_projet.query.entities.Account;
 import com.abdelhadielomari.cqrs_projet.query.entities.AccountOperation;
-import com.abdelhadielomari.cqrs_projet.query.queries.GetAllAccountOperationsQuery;
+import com.abdelhadielomari.cqrs_projet.query.queries.GetAccountSatementQuery;
 import com.abdelhadielomari.cqrs_projet.query.queries.GetAllAccountQuery;
+import com.abdelhadielomari.cqrs_projet.query.queries.GetAllAcountOperations;
+import com.abdelhadielomari.cqrs_projet.query.queries.WatchEventQuery;
 import com.abdelhadielomari.cqrs_projet.query.repository.AccountRepository;
 import com.abdelhadielomari.cqrs_projet.query.repository.OperationRepository;
 import org.axonframework.queryhandling.QueryHandler;
@@ -24,9 +27,21 @@ public class AccountQueryHandler {
     public List<Account> on(GetAllAccountQuery getAllAccountQuery){
         return accountRepository.findAll();
     }
+
     @QueryHandler
-    public List<AccountOperation> on(GetAllAccountOperationsQuery getAllAccountOperationsQuery){
-        return operationRepository.findByAccountId(getAllAccountOperationsQuery.getId());
+    public Account on(GetAccountSatementQuery getAccountSatementQuery){
+        Account account=accountRepository.findById(getAccountSatementQuery.getId()).orElse(null);
+        return account;
+    }
+
+    @QueryHandler
+    public List<AccountOperation> on(GetAllAcountOperations getAllAcountOperations){
+        return operationRepository.findByAccountId(getAllAcountOperations.getAccountId());
+    }
+
+    @QueryHandler
+    public AccountOperation on(WatchEventQuery watchEventQuery){
+        return AccountOperation.builder().build();
     }
 
 }
