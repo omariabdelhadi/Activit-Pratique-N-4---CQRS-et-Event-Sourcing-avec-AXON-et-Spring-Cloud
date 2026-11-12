@@ -1,6 +1,7 @@
 package com.abdelhadielomari.cqrs_projet.query.entities;
 
 import com.abdelhadielomari.cqrs_projet.enums.OperationType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,5 +23,6 @@ public class AccountOperation {
     @Enumerated(EnumType.STRING)
     private OperationType type;
     @ManyToOne
+    @JsonIgnore
     private Account account;
 }
