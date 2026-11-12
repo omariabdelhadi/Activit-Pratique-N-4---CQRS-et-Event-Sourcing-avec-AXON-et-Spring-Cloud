@@ -61,7 +61,7 @@ public class AccountEventHandler {
         operationRepository.save(accountOperation);
         account.setBalance(account.getBalance()-accountDebitEvent.getAmount());
         accountRepository.save(account);
-        queryUpdateEmitter.emit(e->true,accountOperation);
+        queryUpdateEmitter.emit(WatchEventQuery.class,query -> query.getAccountId().equals(account.getId()),accountOperation);
     }
 
     @EventHandler
